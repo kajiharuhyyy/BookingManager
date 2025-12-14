@@ -89,4 +89,16 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
+    @Transactional
+    public void cancel(Long reservationId) {
+        if (reservationId == null) {
+            throw new IllegalArgumentException("reservationIdは必須です");
+        }
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("予約が存在していません: " + reservationId));
+
+        reservation.setStatus(ReservationStatus.CANCELLED);
+    }
+
 }
