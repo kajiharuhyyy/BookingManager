@@ -65,8 +65,9 @@ public class ReservationController {
     // 新規登録処理
     @PostMapping
     public String create(
-            @Valid @ModelAttribute("rereservationForm") ReservationForm form, 
-            BindingResult bindingResult, Model model
+            @Valid @ModelAttribute("reservationForm") ReservationForm form,
+            BindingResult bindingResult,
+            Model model
     ) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("rooms", roomRepository.findAll());
@@ -75,15 +76,14 @@ public class ReservationController {
 
         try {
             reservationService.create(
-                    form.getRoomId(), 
-                    form.getBookDate(), 
-                    form.getStartTime(), 
-                    form.getEndTime(), 
-                    form.getTitle(), 
+                    form.getRoomId(),
+                    form.getBookDate(),
+                    form.getStartTime(),
+                    form.getEndTime(),
+                    form.getTitle(),
                     form.getPersonName()
             );
         } catch (IllegalArgumentException | IllegalStateException e) {
-            // 重複・時間不正などのエラーを画面に出す
             model.addAttribute("rooms", roomRepository.findAll());
             model.addAttribute("errorMessage", e.getMessage());
             return "reservations/new";
@@ -96,6 +96,53 @@ public class ReservationController {
     @PostMapping("/{id}/cancel")
     public String cancel(@PathVariable Long id) {
         reservationService.cancel(id);
+        return "redirect:/reservations";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model) {
+        Reservation r = reservationService.getById(id); // 下に追加する
+        ReservationForm form = new ReservationForm();
+        form.setId(r.getId());
+        form.setRoomId(r.getRoom().getId());
+        form.setBookDate(r.getBookDate());
+        form.setStartTime(r.getStartTime());
+        form.setEndTime(r.getEndTime());
+        form.setTitle(r.getTitle());
+        form.setPersonName(r.getPersonName());
+
+        model.addAttribute("reservationForm", form);
+        model.addAttribute("rooms", roomRepository.findAll());
+        return "reservations/edit";
+    }
+
+    @PostMapping("/{id}/edit")
+    public String update(@PathVariable Long id,
+            @Valid @ModelAttribute("reservationForm") ReservationForm form,
+            BindingResult bindingResult,
+            Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("rooms", roomRepository.findAll());
+            return "reservations/edit";
+        }
+
+        try {
+            reservationService.update(
+                    id,
+                    form.getRoomId(),
+                    form.getBookDate(),
+                    form.getStartTime(),
+                    form.getEndTime(),
+                    form.getTitle(),
+                    form.getPersonName()
+            );
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            model.addAttribute("rooms", roomRepository.findAll());
+            model.addAttribute("errorMessage", e.getMessage());
+            return "reservations/edit";
+        }
+
         return "redirect:/reservations";
     }
 }

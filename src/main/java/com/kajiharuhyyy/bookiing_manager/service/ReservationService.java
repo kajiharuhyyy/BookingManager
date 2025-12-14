@@ -40,6 +40,11 @@ public class ReservationService {
         return reservationRepository.findAll();
     }
 
+    public Reservation getById(Long id) {
+        return reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("予約が存在しません: " + id));
+    }
+
     @Transactional
     public Reservation create(Long roomId, LocalDate bookDate, LocalTime startTime, 
                                 LocalTime endTime, String title, String personName) {
@@ -99,6 +104,55 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("予約が存在していません: " + reservationId));
 
         reservation.setStatus(ReservationStatus.CANCELLED);
+    }
+
+    @Transactional
+    public void validateNoOverlap(Room room, LocalDate bookDate, LocalTime startTime, LocalTime endTime, Long excludeId) {
+
+        if (startTime == null || endTime == null || !startTime.isBefore(endTime)) {
+            throw new IllegalArgumentException("開始時間は終了時間より前にしてください");
+        }
+
+        List<Reservation> overlaps = (excludeId == null)
+            ? reservationRepository.findOverlaps(room, bookDate, ReservationStatus.BOOKED, startTime, endTime)
+            : reservationRepository.findOverlapsExcludingId(room, bookDate, ReservationStatus.BOOKED, excludeId, startTime, endTime);
+
+        if (!overlaps.isEmpty()) {
+            throw new IllegalStateException("その時間はすでに予約があります");
+        }
+    }
+    @Transactional
+    public Reservation update(Long id, Long roomId, LocalDate bookDate, LocalTime startTime,
+                            LocalTime endTime, String title, String personName) {
+
+        if (id == null) throw new IllegalArgumentException("idは必須です");
+        if (roomId == null) throw new IllegalArgumentException("roomIdは必須です");
+        if (bookDate == null) throw new IllegalArgumentException("予約日は必須です");
+        if (startTime == null) throw new IllegalArgumentException("開始時間は必須です");
+        if (endTime == null) throw new IllegalArgumentException("終了時間は必須です");
+        if (title == null || title.isBlank()) throw new IllegalArgumentException("タイトルは必須です");
+
+        if (!startTime.isBefore(endTime)) {
+            throw new IllegalArgumentException("開始時間は終了時間より前にしてください");
+        }
+
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("予約が存在しません: " + id));
+
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("指定した会議室が存在しません: " + roomId));
+
+        // ★自分(id)は除外して重複チェック
+        validateNoOverlap(room, bookDate, startTime, endTime, id);
+
+        reservation.setRoom(room);
+        reservation.setBookDate(bookDate);
+        reservation.setStartTime(startTime);
+        reservation.setEndTime(endTime);
+        reservation.setTitle(title);
+        reservation.setPersonName(personName);
+
+        return reservation;
     }
 
 }

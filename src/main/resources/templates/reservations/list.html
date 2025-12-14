@@ -27,34 +27,42 @@
 
 <hr/>
 
-<table border="1" cellpadding="6">
+<table border="1">
   <thead>
     <tr>
-      <th>ID</th>
       <th>会議室</th>
       <th>日付</th>
       <th>開始</th>
       <th>終了</th>
       <th>予約名</th>
       <th>担当者</th>
-      <th>状態</th>
+      <th>ステータス</th>
       <th>操作</th>
     </tr>
   </thead>
+
   <tbody>
-    <tr th:each="res : ${reservations}">
-      <td th:text="${res.id}"></td>
-      <td th:text="${res.room.name}"></td>
-      <td th:text="${res.bookDate}"></td>
-      <td th:text="${res.startTime}"></td>
-      <td th:text="${res.endTime}"></td>
-      <td th:text="${res.title}"></td>
-      <td th:text="${res.personName}"></td>
-      <td th:text="${res.status}"></td>
+    <tr th:each="r : ${reservations}">
+      <td th:text="${r.room.name}"></td>
+      <td th:text="${r.bookDate}"></td>
+      <td th:text="${r.startTime}"></td>
+      <td th:text="${r.endTime}"></td>
+      <td th:text="${r.title}"></td>
+      <td th:text="${r.personName}"></td>
+      <td th:text="${r.status}"></td>
 
       <td>
-        <form th:action="@{/reservations/{id}/cancel(id=${res.id})}" method="post">
-          <button type="submit">キャンセル</button>
+        <!-- 編集リンク -->
+        <a th:href="@{|/reservations/${r.id}/edit|}">編集</a>
+
+        <!-- キャンセル（BOOKEDのときだけ表示） -->
+        <form th:if="${r.status.name() == 'BOOKED'}"
+              th:action="@{|/reservations/${r.id}/cancel|}"
+              method="post"
+              style="display:inline;">
+          <button type="submit" onclick="return confirm('この予約をキャンセルしますか？')">
+            キャンセル
+          </button>
         </form>
       </td>
     </tr>

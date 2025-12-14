@@ -13,6 +13,8 @@ import lombok.Setter;
 @Setter
 public class ReservationForm {
 
+    private Long id;
+
     @NotNull
     private Long roomId;
 
