@@ -79,4 +79,33 @@ class ReservationServiceTest {
         assertThat(created.getStartTime()).isEqualTo(LocalTime.of(11, 0));
         assertThat(created.getEndTime()).isEqualTo(LocalTime.of(12, 0));
     }
+
+    @Test
+    @DisplayName("キャンセル済み(CANCELLED)の予約は重複判定から除外され、同時間で予約作成できること")
+    void cancelled_shouldNotBlockNewReservation() {
+        Room room = roomRepository.save(Room.builder().name("会議室C").build());
+
+        Reservation created = reservationService.create(
+                room.getId(), 
+                LocalDate.of(2024, 7, 1), 
+                LocalTime.of(10, 0), 
+                LocalTime.of(11, 0), 
+                "一旦予約", 
+                "田中"
+        );
+
+        reservationService.cancel(created.getId());
+
+        Reservation newOne = reservationService.create(
+                room.getId(), 
+                LocalDate.of(2024, 7, 1),
+                LocalTime.of(10, 0), 
+                LocalTime.of(11, 0), 
+                "再予約", 
+                "佐藤"
+        );
+
+        assertThat(newOne.getId()).isNotNull();
+        assertThat(newOne.getStatus()).isEqualTo(ReservationStatus.BOOKED);
+    }
 }
