@@ -18,4 +18,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByRoomAndBookDateAndStatusOrderByStartTimeAsc(
             Room room, LocalDate bookDate, ReservationStatus status
     );
+
+    List<Reservation> findByBookDateOrderByStartTimeAsc(LocalDate bookDate);
+
+    List<Reservation> findByRoomOrderByBookDateAscStartTimeAsc(Room room);
 }
