@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>New Reservation</title>
+</head>
+<body>
+<h1>新規予約</h1>
+
+<div th:if="${errorMessage}" style="color:red;" th:text="${errorMessage}"></div>
+
+<form th:action="@{/reservations}" th:object="${reservationForm}" method="post">
+
+  <div>
+    <label>会議室</label>
+    <select th:field="*{roomId}">
+      <option value="">-- 選択 --</option>
+      <option th:each="r : ${rooms}" th:value="${r.id}" th:text="${r.name}"></option>
+    </select>
+    <div th:if="${#fields.hasErrors('roomId')}" th:errors="*{roomId}" style="color:red;"></div>
+  </div>
+
+  <div>
+    <label>日付</label>
+    <input type="date" th:field="*{bookDate}" />
+    <div th:if="${#fields.hasErrors('bookDate')}" th:errors="*{bookDate}" style="color:red;"></div>
+  </div>
+
+  <div>
+    <label>開始</label>
+    <input type="time" th:field="*{startTime}" />
+    <div th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}" style="color:red;"></div>
+  </div>
+
+  <div>
+    <label>終了</label>
+    <input type="time" th:field="*{endTime}" />
+    <div th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}" style="color:red;"></div>
+  </div>
+
+  <div>
+    <label>予約名</label>
+    <input type="text" th:field="*{title}" />
+    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" style="color:red;"></div>
+  </div>
+
+  <div>
+    <label>担当者</label>
+    <input type="text" th:field="*{personName}" />
+    <div th:if="${#fields.hasErrors('personName')}" th:errors="*{personName}" style="color:red;"></div>
+  </div>
+
+  <button type="submit">登録</button>
+  <a th:href="@{/reservations}">戻る</a>
+
+</form>
+</body>
+</html>

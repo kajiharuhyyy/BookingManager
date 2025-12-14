@@ -57,7 +57,7 @@ public class ReservationController {
     // 新規登録画面
     @GetMapping("/new")
     public String newForm(Model model) {
-        model.addAttribute("ReservationForm", new ReservationForm());
+        model.addAttribute("reservationForm", new ReservationForm());
         model.addAttribute("rooms", roomRepository.findAll());
         return "reservations/new";
     }
@@ -77,7 +77,7 @@ public class ReservationController {
             reservationService.create(
                     form.getRoomId(), 
                     form.getBookDate(), 
-                    form.getStarTime(), 
+                    form.getStartTime(), 
                     form.getEndTime(), 
                     form.getTitle(), 
                     form.getPersonName()

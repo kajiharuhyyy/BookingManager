@@ -20,7 +20,7 @@ public class ReservationForm {
     private LocalDate bookDate;
 
     @NotNull
-    private LocalTime starTime;
+    private LocalTime startTime;
 
     @NotNull
     private LocalTime endTime;
