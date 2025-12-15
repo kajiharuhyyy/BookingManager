@@ -45,6 +45,10 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("予約が存在しません: " + id));
     }
 
+    public List<Reservation> findByDateRange(LocalDate from, LocalDate to) {
+        return reservationRepository.findByBookDateBetweenOrderByBookDateAscStartTimeAsc(from, to);
+    }
+
     @Transactional
     public Reservation create(Long roomId, LocalDate bookDate, LocalTime startTime, 
                                 LocalTime endTime, String title, String personName) {

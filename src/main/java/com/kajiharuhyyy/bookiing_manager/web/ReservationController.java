@@ -145,4 +145,28 @@ public class ReservationController {
 
         return "redirect:/reservations";
     }
+
+    @GetMapping("/calendar")
+    public String calendar(
+            @RequestParam(required = false) LocalDate weekStart,
+            Model model
+    ) {
+        LocalDate base = (weekStart == null)
+                ? LocalDate.now().with(java.time.DayOfWeek.MONDAY)
+                : weekStart;
+
+        List<LocalDate> days = java.util.stream.IntStream.range(0, 7)
+                .mapToObj(i -> base.plusDays(i))
+                .toList();
+
+        model.addAttribute("weekStart", base);
+        model.addAttribute("days", days);
+
+        // ここから下も base を使う
+        List<Reservation> reservations =
+                reservationService.findByDateRange(base, base.plusDays(6));
+        model.addAttribute("reservations", reservations);
+
+        return "reservations/calendar";
+    }
 }

@@ -1,0 +1,75 @@
+<hr>
+<h3>DEBUG</h3>
+<p>予約件数: <span th:text="${#lists.size(reservations)}"></span></p>
+
+<ul>
+  <li th:each="r : ${reservations}"
+      th:text="${r.bookDate + ' ' + r.startTime + '-' + r.endTime + ' ' + r.room.name + ' ' + r.title}">
+  </li>
+</ul>
+<hr>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>予約カレンダー</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; vertical-align: top; }
+    th { background: #f5f5f5; }
+    .item { margin: 6px 0; padding: 6px; border: 1px solid #ddd; border-radius: 6px; }
+  </style>
+</head>
+<body>
+<h1>予約カレンダー（週表示）</h1>
+
+<div>
+  <a th:href="@{/reservations/calendar(weekStart=${weekStart.minusDays(7)})}">← 前週</a>
+  <span th:text="${weekStart}"></span>
+  <a th:href="@{/reservations/calendar(weekStart=${weekStart.plusDays(7)})}">次週 →</a>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>会議室</th>
+      <th th:each="d : ${days}" th:text="${d}">2025-01-01</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr th:each="room : ${rooms}">
+      <td th:text="${room.name}">Room A</td>
+
+      <td th:each="d : ${days}">
+        <div th:each="r : ${reservations}"
+             th:if="${r.room.id == room.id and r.bookDate == d}"
+             class="item">
+          <div>
+            <span th:text="${r.startTime}"></span> - <span th:text="${r.endTime}"></span>
+          </div>
+          <div th:text="${r.title}"></div>
+          <small th:text="${r.personName}"></small>
+        </div>
+        <div>
+            <p>weekStart: <span th:text="${weekStart}"></span></p>
+            <p>days:</p>
+            <ul>
+                <li th:each="d : ${days}" th:text="${d}"></li>
+            </ul>
+
+            <p>reservations count: <span th:text="${#lists.size(reservations)}"></span></p>
+            <ul>
+                <li th:each="r : ${reservations}"
+                    th:text="${r.bookDate + ' ' + r.startTime + '-' + r.endTime + ' ' + r.room.name + ' ' + r.title}">
+                </li>
+            </ul>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p><a th:href="@{/reservations}">一覧へ戻る</a></p>
+</body>
+</html>

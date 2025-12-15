@@ -26,6 +26,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByRoomOrderByBookDateAscStartTimeAsc(Room room);
 
+    List<Reservation> findByBookDateBetweenOrderByBookDateAscStartTimeAsc(LocalDate from, LocalDate to);
+
     @Query("""
         select r from Reservation r
         where r.room = :room
